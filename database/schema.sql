@@ -57,7 +57,7 @@ CREATE TABLE members (
     id INT PRIMARY KEY AUTO_INCREMENT,
     full_name VARCHAR(255),
     email VARCHAR(150),
-    member_type VARCHAR(20), -- 'Student' or 'Faculty'
+    member_type ENUM('Student', 'Faculty') NOT NULL DEFAULT 'Student', 
     expiry_date DATE,
     unpaid_fees DECIMAL(10, 2) DEFAULT 0.00
 );

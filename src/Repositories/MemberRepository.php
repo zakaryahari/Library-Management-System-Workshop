@@ -37,7 +37,21 @@ class MemberRepository {
     }
 
     public function updateFees(int $id, float $amount): bool {
-        return false;
+        try {
+            $this->db->getConnection()->beginTransaction();
+
+            $sql = "UPDATE members SET unpaid_fees = :unpaid_fees WHERE id = :id";
+            $query = $this->db->getConnection()->prepare($sql);
+            $query->bindValue(":id", $id, PDO::PARAM_INT);
+            $query->bindValue(":unpaid_fees", $amount);
+            $query->execute();
+
+            $this->db->getConnection()->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->getConnection()->rollBack();
+            return false;
+        }
     }
 
     public function renewMembership(int $id, string $newDate): bool {

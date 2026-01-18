@@ -37,7 +37,11 @@ class BorrowRepository {
     }
 
     public function findActiveByMember(int $memberId): array {
-        return [];
+        $sql = "SELECT * FROM borrow_records WHERE member_id = :member_id AND return_date IS NULL";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":member_id", $memberId, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchAll();
     }
 
     public function markAsReturned(int $recordId, string $returnDate, float $fee): bool {

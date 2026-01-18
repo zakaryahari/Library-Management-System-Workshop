@@ -55,6 +55,20 @@ class MemberRepository {
     }
 
     public function renewMembership(int $id, string $newDate): bool {
-        return false;
+        try {
+            $this->db->getConnection()->beginTransaction();
+
+            $sql = "UPDATE members SET expiry_date = :expiry_date WHERE id = :id";
+            $query = $this->db->getConnection()->prepare($sql);
+            $query->bindValue(":id", $id, PDO::PARAM_INT);
+            $query->bindValue(":expiry_date", $newDate);
+            $query->execute();
+
+            $this->db->getConnection()->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->getConnection()->rollBack();
+            return false;
+        }
     }
 }

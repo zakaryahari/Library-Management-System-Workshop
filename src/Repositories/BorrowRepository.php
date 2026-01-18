@@ -45,6 +45,21 @@ class BorrowRepository {
     }
 
     public function markAsReturned(int $recordId, string $returnDate, float $fee): bool {
-        return false;
+        try {
+            $this->db->getConnection()->beginTransaction();
+
+            $sql = "UPDATE borrow_records SET return_date = :return_date, late_fee = :late_fee WHERE id = :id";
+            $query = $this->db->getConnection()->prepare($sql);
+            $query->bindValue(":id", $recordId, PDO::PARAM_INT);
+            $query->bindValue(":return_date", $returnDate);
+            $query->bindValue(":late_fee", $fee);
+            $query->execute();
+
+            $this->db->getConnection()->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->getConnection()->rollBack();
+            return false;
+        }
     }
 }

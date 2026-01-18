@@ -61,6 +61,13 @@ class BookRepository {
     }
 
     public function getInventory(string $isbn, int $branchId): int {
-        return 0;
+        $sql = "SELECT available_copies FROM inventory WHERE book_isbn = :isbn AND branch_id = :branch_id";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":isbn", $isbn);
+        $query->bindValue(":branch_id", $branchId, PDO::PARAM_INT);
+        $query->execute();
+        $result = $query->fetch();
+
+        return $result;
     }
 }

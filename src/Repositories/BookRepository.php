@@ -43,7 +43,21 @@ class BookRepository {
     }
 
     public function updateStatus(string $isbn, string $status): bool {
-        return false;
+        try {
+            $this->db->getConnection()->beginTransaction();
+
+            $sql = "UPDATE books SET status = :status WHERE isbn = :isbn";
+            $query = $this->db->getConnection()->prepare($sql);
+            $query->bindValue(":isbn", $isbn);
+            $query->bindValue(":status", $status);
+            $query->execute();
+
+            $this->db->getConnection()->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->getConnection()->rollBack();
+            return false;
+        }
     }
 
     public function getInventory(string $isbn, int $branchId): int {

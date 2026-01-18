@@ -29,7 +29,17 @@ class BookRepository {
     }
 
     public function search(string $query): array {
-        return [];
+        $sql = "SELECT * FROM books WHERE title LIKE :query OR isbn LIKE :query";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":query", "%" . $searchTerm . "%");
+        $query->execute();
+        $results = $query->fetchAll();
+
+        $books = [];
+        foreach ($results as $row) {
+            $books[] = new Book($row['isbn'],$row['title'],(int)$row['publication_year'],(int)$row['category_id'],$row['status']);
+        }
+        return $books;
     }
 
     public function updateStatus(string $isbn, string $status): bool {
